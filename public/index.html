@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Roblox Badge Checker</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+  background: #111;
+  color: #fff;
+}
+input, button {
+  padding: 10px;
+  margin: 5px;
+}
+.badge {
+  margin: 5px 0;
+  padding: 5px;
+  background: #222;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Roblox Badge Checker</h2>
+
+<input id="username" placeholder="Roblox Username">
+<input id="placeId" placeholder="Game (Place ID)">
+<button onclick="check()">Check</button>
+
+<h3 id="result"></h3>
+<div id="missing"></div>
+
+<script>
+async function check() {
+  const username = document.getElementById("username").value;
+  const placeId = document.getElementById("placeId").value;
+
+  document.getElementById("result").innerText = "Loading...";
+  document.getElementById("missing").innerHTML = "";
+
+  const res = await fetch(`/api/check?username=${username}&placeId=${placeId}`);
+  const data = await res.json();
+
+  if (data.error) {
+    document.getElementById("result").innerText = data.error;
+    return;
+  }
+
+  document.getElementById("result").innerText =
+    `Completion: ${data.owned}/${data.total} (${data.percent}%)`;
+
+  const container = document.getElementById("missing");
+  container.innerHTML = "<h3>Missing Badges:</h3>";
+
+  data.missing.forEach(b => {
+    const div = document.createElement("div");
+    div.className = "badge";
+    div.innerText = b.name;
+    container.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
